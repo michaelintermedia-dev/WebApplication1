@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1;
+using WebApplication1.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +12,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite("Data Source=recordings.db"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add CORS policy
 builder.Services.AddCors(options =>
@@ -69,10 +70,10 @@ app.MapPost("/UploadAudio", async (HttpRequest request, AppDbContext _context) =
     }
 
     // 2. Save the metadata to the Database
-    var recording = new AudioRecording
+    var recording = new Recording
     {
-        FileName = file.FileName,
-        FilePath = filePath
+        Name = file.FileName,
+        Date = DateTime.Now
     };
     _context.Recordings.Add(recording);
     await _context.SaveChangesAsync();
