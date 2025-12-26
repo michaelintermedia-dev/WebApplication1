@@ -9,7 +9,7 @@ namespace WebApplication1
         {
             app.MapGet("/hello", () => "Hello, World!");
 
-            app.MapPost("/UploadAudio", async (HttpRequest request, AppDbContext context, IUploadService uploadService) =>
+            app.MapPost("/UploadAudio", async (HttpRequest request, IUploadService uploadService) =>
             {
                 if (!request.HasFormContentType)
                 {
@@ -23,7 +23,7 @@ namespace WebApplication1
                 }
 
                 var file = form.Files[0];
-                var (success, message, recordingId) = await uploadService.UploadAudioAsync(file, context);
+                var (success, message, recordingId) = await uploadService.UploadAudioAsync(file);
 
                 if (!success)
                 {
@@ -31,6 +31,19 @@ namespace WebApplication1
                 }
 
                 return Results.Ok(new { message, recordingId });
+            });
+
+            app.MapGet("/GetRecordings", async (IDbService dbService) =>
+            {
+                try
+                {
+                    var recordings = await dbService.GetAllRecordingsAsync();
+                    return Results.Ok(recordings);
+                }
+                catch (Exception ex)
+                {
+                    return Results.BadRequest(new { message = ex.Message });
+                }
             });
         }
     }

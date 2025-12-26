@@ -4,19 +4,21 @@ namespace WebApplication1.Services;
 
 public interface IUploadService
 {
-    Task<(bool Success, string Message, int? RecordingId)> UploadAudioAsync(IFormFile file, AppDbContext context);
+    Task<(bool Success, string Message, int? RecordingId)> UploadAudioAsync(IFormFile file);
 }
 
 public class UploadService : IUploadService
 {
     private readonly string _uploadsFolder;
+    private readonly IDbService _dbService;
 
-    public UploadService()
+    public UploadService(IDbService dbService)
     {
+        _dbService = dbService;
         _uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
     }
 
-    public async Task<(bool Success, string Message, int? RecordingId)> UploadAudioAsync(IFormFile file, AppDbContext context)
+    public async Task<(bool Success, string Message, int? RecordingId)> UploadAudioAsync(IFormFile file)
     {
         try
         {
@@ -39,14 +41,8 @@ public class UploadService : IUploadService
                 await file.CopyToAsync(stream);
             }
 
-            // Save metadata to database
-            var recording = new Recording
-            {
-                Name = file.FileName,
-                Date = DateTime.Now
-            };
-            context.Recordings.Add(recording);
-            await context.SaveChangesAsync();
+            // Save metadata to database using DbService
+            var recording = await _dbService.AddRecordingAsync(file.FileName, DateTime.UtcNow.Date);
 
             return (true, "Uploaded successfully!", recording.Id);
         }
