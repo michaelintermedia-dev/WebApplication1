@@ -45,6 +45,35 @@ namespace WebApplication1
                     return Results.BadRequest(new { message = ex.Message });
                 }
             });
+
+            app.MapGet("/DownloadAudio/{filename}", (string filename) =>
+            {
+                try
+                {
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+                    var filePath = Path.Combine(uploadsFolder, filename);
+
+                    // Prevent directory traversal attacks
+                    var fullPath = Path.GetFullPath(filePath);
+                    var fullUploadsPath = Path.GetFullPath(uploadsFolder);
+
+                    if (!fullPath.StartsWith(fullUploadsPath))
+                    {
+                        return Results.BadRequest(new { message = "Invalid file path" });
+                    }
+
+                    if (!File.Exists(filePath))
+                    {
+                        return Results.NotFound(new { message = "File not found" });
+                    }
+
+                    return Results.File(filePath, "application/octet-stream", filename);
+                }
+                catch (Exception ex)
+                {
+                    return Results.BadRequest(new { message = $"Download failed: {ex.Message}" });
+                }
+            });
         }
     }
 }
