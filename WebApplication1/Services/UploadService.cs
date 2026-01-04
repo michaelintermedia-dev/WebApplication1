@@ -11,10 +11,12 @@ public class UploadService : IUploadService
 {
     private readonly string _uploadsFolder;
     private readonly IDbService _dbService;
+    private readonly IMessaging _messaging;
 
-    public UploadService(IDbService dbService)
+    public UploadService(IDbService dbService, IMessaging messaging)
     {
         _dbService = dbService;
+        _messaging = messaging;
         _uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
     }
 
@@ -43,6 +45,7 @@ public class UploadService : IUploadService
 
             // Save metadata to database using DbService
             var recording = await _dbService.AddRecordingAsync(file.FileName, DateTime.UtcNow.Date);
+            await _messaging.SendMessageAsync(recording.Id, file.FileName);
 
             return (true, "Uploaded successfully!", recording.Id);
         }
