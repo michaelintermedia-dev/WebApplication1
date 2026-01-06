@@ -80,31 +80,8 @@ namespace WebApplication1
 
             app.MapPost("/devices/register", async (RegisterDeviceRequest request, IDeviceService deviceService) =>
             {
-
-                /*
-                 
-                var device = new Device 
-        { 
-            Token = request.Token,
-            Platform = request.Platform,
-            RegisteredAt = DateTime.UtcNow
-        };
-        
-        await _deviceRepo.SaveAsync(device);
-        
-        return Ok(new { success = true, message = "Device registered" });
-                 
-                 */
-
-                try
-                {
-                    await deviceService.RegisterDeviceAsync(request.token, request.platform);
-                    return Results.Ok(new { success = true });
-                }
-                catch (Exception ex)
-                {
-                    return Results.BadRequest(new { message = ex.Message });
-                }
+                await deviceService.RegisterDeviceAsync(request.token, request.platform);
+                return Results.Ok(new { success = true });
             });
         }
     }

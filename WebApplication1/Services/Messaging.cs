@@ -5,7 +5,8 @@ namespace WebApplication1.Services
 {
     public interface IMessaging
     {
-        Task SendMessageAsync(int audioId, string filePath);
+        Task SendMessage1Async(int audioId, string filePath); 
+        Task SendMessageAsync(string topic, string message);
     }
 
     public interface IConsumer
@@ -23,14 +24,14 @@ namespace WebApplication1.Services
             _logger = logger;
 
             var config = new ProducerConfig
-            {                
+            {
                 BootstrapServers = "localhost:9092" // Update with your Kafka broker address
             };
 
             _producer = new ProducerBuilder<string, string>(config).Build();
         }
 
-        public async Task SendMessageAsync(int audioId, string filePath)
+        public async Task SendMessage1Async(int audioId, string filePath)
         {
             try
             {
@@ -58,10 +59,33 @@ namespace WebApplication1.Services
                 throw;
             }
         }
+        public async Task SendMessageAsync(string topic, string message)
+        {
+            try
+            {
+
+
+                var result = await _producer.ProduceAsync(
+                    topic,
+                    new Message<string, string>
+                    {
+                        Key = message.GetHashCode().ToString(),
+                        Value = message
+                    }
+                );
+
+                _logger.LogInformation($"Message sent to Kafka topic {topic} with key {result.Key}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to send Kafka message: {ex.Message}");
+                throw;
+            }
+        }
 
         public void Dispose()
         {
             _producer?.Dispose();
         }
-    }    
+    }
 }

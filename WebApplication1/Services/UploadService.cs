@@ -45,7 +45,7 @@ public class UploadService : IUploadService
 
             // Save metadata to database using DbService
             var recording = await _dbService.AddRecordingAsync(file.FileName, DateTime.UtcNow.Date);
-            await _messaging.SendMessageAsync(recording.Id, file.FileName);
+            await _messaging.SendMessage1Async(recording.Id, file.FileName);
 
             return (true, "Uploaded successfully!", recording.Id);
         }

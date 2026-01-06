@@ -65,7 +65,7 @@ namespace WebApplication1.Services
         {
             _context.Devices.Add(device);
             await _context.SaveChangesAsync();
-            return
+            return device;
         }
     }
 }

@@ -27,9 +27,6 @@ public partial class AppDbContext : DbContext
     {
         modelBuilder.Entity<Device>(entity =>
         {
-            entity.HasNoKey();
-
-            entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.LastUsedAt).HasColumnType("datetime");
             entity.Property(e => e.Platform).HasMaxLength(50);
             entity.Property(e => e.RegisteredAt).HasColumnType("datetime");

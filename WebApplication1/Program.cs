@@ -40,10 +40,13 @@ builder.Services.AddScoped<IDbService, DbService>();
 builder.Services.AddScoped<IMessaging, Messaging>();
 builder.Services.AddScoped<IDeviceService, DeviceService>();
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+//builder.Services.AddProblemDetails();
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
+app.UseExceptionHandler(_ => { });
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
