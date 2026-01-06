@@ -9,6 +9,7 @@ namespace WebApplication1.Services
         Task<List<Recording>> GetAllRecordingsAsync();
         Task<Recording> AddRecordingAsync(string name, DateTime date);
         //Task SaveAnalysisResultAsync(int audioId, WhisperResult result);
+        Task<Device> RegisterDeviceAsync(Device device);
     }
 
     public class DbService : IDbService
@@ -58,6 +59,13 @@ namespace WebApplication1.Services
             {
                 throw new InvalidOperationException($"Failed to add recording: {ex.Message}", ex);
             }
+        }
+
+        public async Task<Device> RegisterDeviceAsync(Device device)
+        {
+            _context.Devices.Add(device);
+            await _context.SaveChangesAsync();
+            return
         }
     }
 }

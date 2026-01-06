@@ -38,6 +38,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<IUploadService, UploadService>();
 builder.Services.AddScoped<IDbService, DbService>();
 builder.Services.AddScoped<IMessaging, Messaging>();
+builder.Services.AddScoped<IDeviceService, DeviceService>();
 
 builder.Services.AddHealthChecks();
 

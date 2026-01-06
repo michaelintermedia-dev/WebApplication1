@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure.Core;
+using Confluent.Kafka;
+using Microsoft.AspNetCore.Mvc;
 using WebApplication1.Models;
 using WebApplication1.Services;
 
@@ -75,6 +77,69 @@ namespace WebApplication1
                     return Results.BadRequest(new { message = $"Download failed: {ex.Message}" });
                 }
             });
+
+            app.MapPost("/devices/register", async (RegisterDeviceRequest request, IDeviceService deviceService) =>
+            {
+
+                /*
+                 
+                var device = new Device 
+        { 
+            Token = request.Token,
+            Platform = request.Platform,
+            RegisteredAt = DateTime.UtcNow
+        };
+        
+        await _deviceRepo.SaveAsync(device);
+        
+        return Ok(new { success = true, message = "Device registered" });
+                 
+                 */
+
+                try
+                {
+                    await deviceService.RegisterDeviceAsync(request.token, request.platform);
+                    return Results.Ok(new { success = true });
+                }
+                catch (Exception ex)
+                {
+                    return Results.BadRequest(new { message = ex.Message });
+                }
+            });
         }
     }
+
+    record RegisterDeviceRequest(string token, string platform);
 }
+
+
+
+
+/*
+ 
+ 
+ // Topic: user.registered
+{
+  "userId": "user123",
+  "deviceTokens": ["token1", "token2"],
+  "platform": "android",
+  "registeredAt": "2024-01-06T10:00:00Z"
+}
+
+// Topic: audio.analyze.completed
+{
+  "userId": "user123",
+  "audioId": "audio456",
+  "analysisResult": "recognized: 'hello'",
+  "deviceTokens": ["token1", "token2"],
+  "completedAt": "2024-01-06T10:05:00Z"
+}
+ 
+ // Topic: user.deregistered
+{
+  "userId": "user123",
+  "deviceTokens": ["token1", "token2"],
+  "deregisteredAt": "2024-01-06T10:00:00Z"
+}
+ 
+ */
